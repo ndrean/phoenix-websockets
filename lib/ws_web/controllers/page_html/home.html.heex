@@ -1,0 +1,29 @@
+<.flash_group flash={@flash} />
+<script type="text/javascript" defer src={~p"/assets/rawWebSocket.js"}>
+</script>
+<script>
+  window.userToken = "<%= @token %>";
+</script>
+
+<div class="px-4 py-8 sm:px-6 sm:py-12 md:px-8 md:py-16 lg:px-12 lg:py-20 xl:px-16 xl:py-24">
+  <div class="mx-auto max-w-xl lg:max-w-4xl xl:max-w-5xl">
+    <div class="flex flex-col lg:flex-row justify-center items-center gap-8 lg:gap-12">
+      <h1>Fetch image sent via the raw WebSocket to the server, and saved on disk</h1>
+      <img id="fetch-one" class="w-full max-w-[512px] min-w-[512px] h-auto" />
+      <h1>Fetch image in Channel sent to the server, and saved on disk</h1>
+      <img id="fetch-two" class="w-full max-w-[512px] min-w-[512px] h-auto" />
+      <br />
+      <hr />
+      <button id="requestChData" type="button">Request Binary Data</button>
+      <h1>Sent by the server via Channel</h1>
+      <br />
+      <img id="pic-channel" class="w-full max-w-[512px] min-w-[512px] h-auto" />
+      <br />
+      <hr />
+      <button id="requestWsData" disabled type="button">Request Binary Data</button>
+      <h1>Sent by the server via raw WebSocket</h1>
+      <br />
+      <img id="pic-ws" class="w-full max-w-[512px] min-w-[512px] h-auto mt-8 lg:mt-0" />
+    </div>
+  </div>
+</div>
