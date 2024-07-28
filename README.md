@@ -216,7 +216,7 @@ You have the Phoenix LiveView Uplaods.
 An example if you have an endpoint that serves large files and you want to download and push through a Channel.
 
 <details>
-<summary> An example of client code
+<summary> An example of client code</summary>
 
 ```js
 const sendLargeFileViaChannel = async (channel) => {
@@ -258,6 +258,9 @@ const sendLargeFileViaChannel = async (channel) => {
   }
 };
 ```
+
+</details>
+<br/>
 
 and the server code is:
 
@@ -326,7 +329,7 @@ defmodule WsHandler do
 
   # <https://hexdocs.pm/phoenix/Phoenix.Socket.Transport.html#module-example>
 
-  def child_spec(\_opts); do: :ignore
+  def child_spec(_opts); do: :ignore
 
   def connect(%{params: %{"token" => token}} = info) do
     case Phoenix.Token.verify(WsWeb.Endpoint, "user socket", token, max_age: 86400) do
@@ -338,7 +341,7 @@ defmodule WsHandler do
     end
   end
 
-  def connect(\_info), do: :error
+  def connect(_info), do: :error
 
   def init(state); do: {:ok, state}
 
@@ -392,7 +395,7 @@ defmodule MyApp.ClientWebsocketHandler do
 end
 ```
 
-To send data to the client module, we push it via the LiveSocket:
+To send data to the client module, we push it via the LiveSocket (and the LiveView subscrbed to the PubSub topic):
 
 ```elixir
 def handle_info(%{topic: "price", event: "new", payload: %{value: value}}, socket) do
