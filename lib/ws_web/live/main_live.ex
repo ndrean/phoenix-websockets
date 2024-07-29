@@ -112,12 +112,21 @@ defmodule WsWeb.MainLive do
     """
   end
 
+  defp encrypt_csrf_into_ets(session_csrf_token) do
+    encrypted_csrf = Phoenix.Token.sign(WsWeb.Endpoint, "csrf token", session_csrf_token)
+    :ets.insert(:my_token, {"user_id", encrypted_csrf})
+  end
+  
   @impl true
   def mount(_params, _session, socket) do
-    token = Phoenix.Token.sign(WsWeb.Endpoint, "user socket", "user_id")
-
+    user_token = Phoenix.Token.sign(WsWeb.Endpoint, "user socket", "user_id")
+    
     if connected?(socket) do
+      Phoenix.LiveView.get_connect_params(socket)["_csrf_token"]
+      |> encrypt_csrf_into_ets()
+
       :ok = WsWeb.Endpoint.subscribe("price")
+
       symbol = "bitcoin"
 
       DynamicSupervisor.start_child(DynSup, {
@@ -128,17 +137,16 @@ defmodule WsWeb.MainLive do
 
     {:ok,
      socket
-     |> assign(%{token: token, image_base64: nil, blob_size: nil, encoded_len: nil, b64_data: nil})}
+     |> assign(%{user_token: user_token, image_base64: nil, blob_size: nil, encoded_len: nil, b64_data: nil})}
   end
 
   @impl true
-  def handle_event(
-        "send_as_base64",
-        %{"data_as_b64" => bin, "blob_size" => blob_size, "string_length" => encoded_len},
-        socket
-      ) do
+  def handle_event("send_as_base64", params, socket) do
+    %{"data_as_b64" => bin, "blob_size" => blob_size, "string_length" => encoded_len} = params
+
     {:noreply,
-     assign(socket, %{image_base64: bin, blob_size: blob_size, encoded_len: encoded_len})}
+     socket
+     |> assign(%{image_base64: bin, blob_size: blob_size, encoded_len: encoded_len})}
   end
 
   def handle_event("produce-base64", _, socket) do

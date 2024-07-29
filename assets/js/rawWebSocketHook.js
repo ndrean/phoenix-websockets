@@ -7,17 +7,22 @@ export const rawWebSocketHook = {
       reconnectTimeout = 1_000,
       ws;
 
+    let csrfToken = document
+      .querySelector("meta[name='csrf-token']")
+      .getAttribute("content");
+
     function connect() {
       if (ws) ws.close();
 
       ws = new WebSocket(
-        `${protocole}://${window.location.host}/rawsocket?token=${window.userToken}`
+        `${protocole}://${window.location.host}/rawsocket?user_token=${window.userToken}&_csrf_token=${csrfToken}`
       );
 
       const sendButton = document.getElementById("send-via-ws");
       const requestButton = document.getElementById("request-data-from-ws");
 
       ws.onopen = () => {
+        ws.send("READY");
         console.log("Raw WS Connected to the server");
         requestButton.disabled = false;
         clearInterval(timerId);

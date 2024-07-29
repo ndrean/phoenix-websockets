@@ -5,7 +5,7 @@ export default function useChannel(socket, topic) {
       return;
     }
 
-    const channel = socket.channel(topic, { token: window.userToken });
+    const channel = socket.channel(topic, { user_token: window.userToken });
     channel
       .join()
       .receive("ok", () => {

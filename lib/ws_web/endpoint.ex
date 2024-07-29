@@ -19,7 +19,8 @@ defmodule WsWeb.Endpoint do
   socket "/rawsocket", Ws.RawWebsocketHandler,
     websocket: [
       path: "",
-      check_origin: Application.compile_env(:ws, :websocket_origins)
+      check_origin: Application.compile_env(:ws, :websocket_origins),
+      connect_info: [session: @session_options]
     ]
 
   socket "/userSocket", WsWeb.UserSocket,

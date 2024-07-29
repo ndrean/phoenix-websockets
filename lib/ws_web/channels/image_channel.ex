@@ -2,7 +2,7 @@ defmodule WsWeb.ImageChannel do
   use Phoenix.Channel
 
   @impl true
-  def join("image", %{"token" => user_token}, socket) do
+  def join("image", %{"user_token" => user_token}, socket) do
     case Phoenix.Token.verify(WsWeb.Endpoint, "user socket", user_token, max_age: 86_400) do
       {:ok, user_id} ->
         {:ok, assign(socket, :user_id, user_id)}
@@ -21,7 +21,6 @@ defmodule WsWeb.ImageChannel do
   end
 
   def handle_in("request-image", _, socket) do
-    # data = File.read!("channel.jpg")
     File.stream!("channel.jpg", 1024 * 10)
     |> Stream.with_index()
     |> Enum.each(fn {chunk, index} ->

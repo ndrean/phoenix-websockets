@@ -7,6 +7,8 @@ defmodule Ws.Application do
 
   @impl true
   def start(_type, _args) do
+    :my_token = :ets.new(:my_token, [:set, :public, :named_table])
+
     children = [
       WsWeb.Telemetry,
       {DNSCluster, query: Application.get_env(:ws, :dns_cluster_query) || :ignore},

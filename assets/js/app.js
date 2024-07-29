@@ -1,12 +1,11 @@
-import "./channelHook.js";
-import { pushHook } from "./pushHook.js";
-import { rawWebSocketHook } from "./rawWebSocketHook.js";
-import { channelHook } from "./channelHook.js";
-import { StockChart } from "./chartHook.js";
 import "phoenix_html";
 import { Socket } from "phoenix";
 import { LiveSocket } from "phoenix_live_view";
 import topbar from "../vendor/topbar";
+import { pushHook } from "./pushHook.js";
+import { rawWebSocketHook } from "./rawWebSocketHook.js";
+import { channelHook } from "./channelHook.js";
+import { StockChart } from "./chartHook.js";
 
 let csrfToken = document
   .querySelector("meta[name='csrf-token']")
@@ -16,7 +15,6 @@ let liveSocket = new LiveSocket("/live", Socket, {
   longPollFallbackMs: 2500,
   params: { _csrf_token: csrfToken },
   hooks: { pushHook, channelHook, rawWebSocketHook, StockChart },
-  // hooks: { pushHook, channelHook },
 });
 
 // Show progress bar on live navigation and form submits
