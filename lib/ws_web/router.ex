@@ -1,7 +1,7 @@
 defmodule WsWeb.Router do
   use WsWeb, :router
 
-  @content_security_policy "frame-ancestors 'self'; base-uri 'self'; default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; connect-src 'self' ws wss https://picsum.photos/300/300.jpg https://fastly.picsum.photos ;img-src 'self' data: blob:;style-src 'self' 'unsafe-inline';font-src 'self';form-action 'self';"
+  @content_security_policy "frame-ancestors 'self'; base-uri 'self'; default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; connect-src 'self' ws wss https://picsum.photos/300/300.jpg https://fastly.picsum.photos https://commondatastorage.googleapis.com/ ;img-src 'self' data: blob:;style-src 'self' 'unsafe-inline';font-src 'self';form-action 'self';"
 
   pipeline :browser do
     plug :accepts, ["html"]

@@ -3,18 +3,19 @@ defmodule WsWeb.ImageChannel do
 
   @impl true
   def join("image", %{"user_token" => user_token}, socket) do
-    case Phoenix.Token.verify(WsWeb.Endpoint, "user socket", user_token, max_age: 86_400) do
-      {:ok, user_id} ->
-        {:ok, assign(socket, :user_id, user_id)}
+    {:ok, user_id} =
+      Phoenix.Token.verify(WsWeb.Endpoint, "user token", user_token, max_age: 86_400)
 
-      {:error, _reason} ->
-        :error
+    if authorized?(user_token) do
+      {:ok, assign(socket, :user_id, user_id)}
+    else
+      :error
     end
   end
 
   @impl true
   def handle_in("pic-to-server", {:binary, data}, socket) do
-    IO.puts("CH: received binary")
+    IO.puts("CH: received binary: #{byte_size(data)}")
     File.write("channel.jpg", data)
     push(socket, "image-saved-to-disk", %{text: "Image received via Channel saved on disk"})
     {:noreply, socket}
@@ -34,12 +35,16 @@ defmodule WsWeb.ImageChannel do
   end
 
   def handle_in("chunk", {:binary, data}, socket) when is_binary(data) do
-    # IO.puts("CH: received chunk")
+    IO.puts("CH: received chunk ...#{byte_size(data)}")
     File.write("large.mp4", data, [:append])
     {:noreply, socket}
   end
 
-  def handle_in("chunk", %{}, socket) do
-    {:noreply, socket}
+  # def handle_in("chunk", %{}, socket) do
+  #   {:noreply, socket}
+  # end
+
+  defp authorized?(_id) do
+    true
   end
 end

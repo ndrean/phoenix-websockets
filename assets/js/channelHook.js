@@ -44,8 +44,10 @@ export const channelHook = {
         imageChannel,
         "display-img-sent-to-server-via-ch"
       );
-      await sendLargeFileViaChannel(imageChannel);
     };
+
+    document.getElementById("download-big-file").onclick = async () =>
+      await sendLargeFileViaChannel(imageChannel);
 
     function sendPicToServerViaChannel(channel, picId) {
       let url = "https://picsum.photos/300/300.jpg";
@@ -68,8 +70,6 @@ export const channelHook = {
       console.log(contentLength);
 
       let receivedLength = 0;
-      let chunks = [];
-      const chunkSize = 1024 * 1024 * 5; // 5MB chunks
 
       while (true) {
         const { done, value } = await reader.read();
@@ -80,41 +80,11 @@ export const channelHook = {
         }
 
         receivedLength += value.length;
-        chunks.push(value);
 
-        if (chunks.length * chunkSize >= chunkSize) {
-          const blob = new Blob(chunks).slice(0, chunkSize);
-          const arrayBuffer = await blob.arrayBuffer();
-          channel.push("chunk", arrayBuffer);
-          chunks = [new Blob(chunks).slice(chunkSize)];
-        }
+        channel.push("chunk", value.buffer);
 
         console.log(`Received ${receivedLength} of ${contentLength} bytes`);
       }
-
-      // Send any remaining data
-      if (chunks.length > 0) {
-        channel.push("chunk", new Blob(chunks));
-      }
     };
-
-    /*
-      imageChannel.on("image-received", (payload) =>
-        displayReceivedMsg(payload, "image-received", "from-server-via-channel")
-      );
-
-      function displayReceivedMsg(payload, topic, picId) {
-        console.log("displayReceivedMsg");
-        const { response, status } = payload;
-        if (response instanceof ArrayBuffer) {
-          console.log("Received a pic via Channel", status);
-          let blob = new Blob([response], { type: "image/jpeg" });
-          let imageUrl = URL.createObjectURL(blob);
-          document.getElementById(picId).src = imageUrl;
-        } else {
-          console.log("Channel received a message :", topic);
-        }
-      }
-      */
   },
 };

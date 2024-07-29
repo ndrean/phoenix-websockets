@@ -79,7 +79,8 @@ defmodule WsWeb.MainLive do
             <figcaption>Image sent to the server via a Channel</figcaption>
           </figure>
           <br />
-
+          <.button id="download-big-file">Download big file</.button>
+          <p>Check your logs and file system</p>
           <br />
           <hr />
           <.button id="request-data-from-channel" type="button">
@@ -116,11 +117,11 @@ defmodule WsWeb.MainLive do
     encrypted_csrf = Phoenix.Token.sign(WsWeb.Endpoint, "csrf token", session_csrf_token)
     :ets.insert(:my_token, {"user_id", encrypted_csrf})
   end
-  
+
   @impl true
   def mount(_params, _session, socket) do
-    user_token = Phoenix.Token.sign(WsWeb.Endpoint, "user socket", "user_id")
-    
+    user_token = Phoenix.Token.sign(WsWeb.Endpoint, "user token", "user_id")
+
     if connected?(socket) do
       Phoenix.LiveView.get_connect_params(socket)["_csrf_token"]
       |> encrypt_csrf_into_ets()
@@ -137,7 +138,13 @@ defmodule WsWeb.MainLive do
 
     {:ok,
      socket
-     |> assign(%{user_token: user_token, image_base64: nil, blob_size: nil, encoded_len: nil, b64_data: nil})}
+     |> assign(%{
+       user_token: user_token,
+       image_base64: nil,
+       blob_size: nil,
+       encoded_len: nil,
+       b64_data: nil
+     })}
   end
 
   @impl true

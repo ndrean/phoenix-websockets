@@ -35,5 +35,5 @@ ws-*.tar
 npm-debug.log
 /assets/node_modules/
 *.jpg
-
+*.mp4
 .elixir-tools/

@@ -11,12 +11,12 @@ defmodule Ws.RawWebsocketHandler do
   end
 
   def connect(%{params: %{"user_token" => user_token, "_csrf_token" => csrf_token}} = info) do
-    case Phoenix.Token.verify(WsWeb.Endpoint, "user socket", user_token, max_age: 86_400) do
+    case Phoenix.Token.verify(WsWeb.Endpoint, "user token", user_token, max_age: 86_400) do
       {:ok, user_id} ->
         [{"user_id", encrypted_csrf}] = :ets.lookup(:my_token, "user_id")
-       
+
         case Phoenix.Token.verify(WsWeb.Endpoint, "csrf token", encrypted_csrf) do
-          {:ok, ^csrf_token}  -> {:ok, Map.put(info, user_id, user_id)}
+          {:ok, ^csrf_token} -> {:ok, Map.put(info, user_id, user_id)}
           {:error, _} -> :error
         end
 

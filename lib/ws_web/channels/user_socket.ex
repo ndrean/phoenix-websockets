@@ -5,7 +5,7 @@ defmodule WsWeb.UserSocket do
 
   @impl true
   def connect(%{"userToken" => user_token}, socket) do
-    case Phoenix.Token.verify(WsWeb.Endpoint, "user socket", user_token, max_age: 86_400) do
+    case Phoenix.Token.verify(WsWeb.Endpoint, "user token", user_token, max_age: 86_400) do
       {:ok, user_id} ->
         {:ok, assign(socket, :user_id, user_id)}
 

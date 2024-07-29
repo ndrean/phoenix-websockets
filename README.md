@@ -213,10 +213,8 @@ function displayReceivedMsg(payload, topic, picId) {
 
 You have the Phoenix LiveView Uplaods.
 
-An example if you have an endpoint that serves large files and you want to download and push through a Channel.
-
 <details>
-<summary> An example of client code</summary>
+<summary> An example if you have an endpoint that serves large files and you want to download and push through a Channel</summary>
 
 ```js
 const sendLargeFileViaChannel = async (channel) => {
@@ -228,8 +226,6 @@ const sendLargeFileViaChannel = async (channel) => {
   console.log(contentLength);
 
   let receivedLength = 0;
-  let chunks = [];
-  const chunkSize = 1024 * 1024 * 5; // 5MB chunks
 
   while (true) {
     const { done, value } = await reader.read();
@@ -240,21 +236,10 @@ const sendLargeFileViaChannel = async (channel) => {
     }
 
     receivedLength += value.length;
-    chunks.push(value);
 
-    if (chunks.length * chunkSize >= chunkSize) {
-      const blob = new Blob(chunks).slice(0, chunkSize);
-      const arrayBuffer = await blob.arrayBuffer();
-      channel.push("chunk", arrayBuffer);
-      chunks = [new Blob(chunks).slice(chunkSize)];
-    }
+    channel.push("chunk", value.buffer);
 
     console.log(`Received ${receivedLength} of ${contentLength} bytes`);
-  }
-
-  // Send any remaining data
-  if (chunks.length > 0) {
-    channel.push("chunk", new Blob(chunks));
   }
 };
 ```
@@ -266,12 +251,7 @@ and the server code is:
 
 ```elixir
 def handle_in("chunk", {:binary, data}, socket) when is_binary(data) do
-  # IO.puts("CH: received chunk")
   File.write("large.mp4", data, [:append])
-  {:noreply, socket}
-end
-
-def handle_in("chunk", %{}, socket) do
   {:noreply, socket}
 end
 ```
