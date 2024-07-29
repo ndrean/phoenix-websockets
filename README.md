@@ -301,7 +301,7 @@ Server-side, we have:
     ]
 ```
 
-The server module "WsHandler" receives binary data:
+The server module "WsHandler" receives binary data. We check the "user_token" and the csrf_token as set via a meta tag against their encrypted version (the csrf token is collected with `Phoenix.LiveView.get_connect_params`in the LiveView mount/3 once the socket is connected, and is saved encrypted into an ETS table).
 
 ```elixir
 defmodule WsHandler do
@@ -311,10 +311,15 @@ defmodule WsHandler do
 
   def child_spec(_opts); do: :ignore
 
-  def connect(%{params: %{"token" => token}} = info) do
-    case Phoenix.Token.verify(WsWeb.Endpoint, "user socket", token, max_age: 86400) do
+  def connect(%{params: %{"user_token" => user_token, "_csrf_token" => csrf_token}} = info) do
+    case Phoenix.Token.verify(WsWeb.Endpoint, "user token", user_token, max_age: 86_400) do
       {:ok, user_id} ->
-        {:ok, Map.put(info, :user_id, user_id)}
+        [{"user_id", encrypted_csrf}] = :ets.lookup(:my_token, "user_id")
+
+        case Phoenix.Token.verify(WsWeb.Endpoint, "csrf token", encrypted_csrf) do
+          {:ok, ^csrf_token} -> {:ok, Map.put(info, user_id, user_id)}
+          {:error, _} -> :error
+        end
 
       {:error, _reason} ->
         :error
